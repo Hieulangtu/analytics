@@ -96,6 +96,7 @@ import io
 def createRouter(prefix):
     mainpath = "/presence"
     tags = ["Přítomnost skupinách"]
+    # tags ở trên là tên dự án cá nhân mỗi người
 
     router = APIRouter(prefix=prefix)
     WhereDescription = "filtr omezující vybrané skupiny"
