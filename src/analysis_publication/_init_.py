@@ -6,34 +6,40 @@ import pandas as pd
 # https://github.com/wexee/aiz8s
 #
 #####################################################################################
-query = """query($where: GroupInputWhereFilter){
-    result: groupPage (where: $where, limit:1000) {
+query= gql("""query{
+  result: publicationPage{
     id
     name
-    memberships(limit:1000) {
-      user {
+    publicationtype {
+      id
+      name
+
+    }
+    authors{
+      id
+      order
+      lastchange
+      share
+      valid
+      user{
         id
-        fullname
-        classifications {
-          level {
-            id
-            name
-          }
-          id
-          order
-          semester {
-            id
-            order
-            subject {
-              id
-              name
-            }
-          }
-        }
+        name
+        surname
+        email
       }
     }
+    place
+    publishedDate
+    valid
+    reference
+    subjects {
+      id
+      name
+    }
+    
   }
-}"""
+  
+} """)
 
 async def resolve_json(variables, cookies):
     assert "where" in variables, f"missing where in parameters"
@@ -52,17 +58,18 @@ async def resolve_json(variables, cookies):
 async def resolve_flat_json(variables, cookies):
     jsonData = await resolve_json(variables=variables, cookies=cookies)
     mapper = {
-        "group_id": "id",
-        "group_name": "name",
-        "user_id": "memberships.user.id",
-        "user_email": "memberships.user.email",
-        "user_fullname": "memberships.user.fullname",
-        "classification_id": "memberships.user.classifications.id",
-        "classification_order": "memberships.user.classifications.order",
-        "classification_level": "memberships.user.classifications.level.name",
-        "classification_subject_id": "memberships.user.classifications.semester.subject.id",
-        "classification_subject_name": "memberships.user.classifications.semester.subject.name",
-        "classification_sem": "memberships.user.classifications.semester.order",       
+        "publication_id": "id",
+        "publication_name": "name",
+        "published_place": "place",
+        "published_date": "publishedDate",
+        "publication_valid": "valid",
+        "publication_reference": "reference",
+        "publication_type": "publicationtype.name",
+        "author_name": "author.user.name",
+        "author_email": "author.user.email",
+        "author_share": "author.share",
+        "author_order": "author.order",
+
     }
     # print(jsonData, flush=True)
     pivotdata = list(flatten(jsonData, {}, mapper))
@@ -94,8 +101,8 @@ import re
 import io
 
 def createRouter(prefix):
-    mainpath = "/presence"
-    tags = ["Přítomnost skupinách"]
+    mainpath = "publication"
+    tags = ["Publikace"]
     # tags ở trên là tên dự án cá nhân mỗi người
 
     router = APIRouter(prefix=prefix)
