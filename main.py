@@ -142,3 +142,6 @@ app.include_router(createRouter999(prefix="/analysis"))
 
 from src.analysis_calendar import createRouter as createRouter_calendar
 app.include_router(createRouter_calendar(prefix="/analysis"))
+
+from src.analysis_publication import createRouter as createRouter_publication
+app.include_router(createRouter_publication(prefix="/analysis"))
